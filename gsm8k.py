@@ -17,7 +17,7 @@ def record_to_sample(record):
     return Sample(
         input = input, 
         target = target, 
-        metadata = {"reasonning": reasoning.strip()}, 
+        metadata = {"reasoning": reasoning.strip()}, 
     )
 
 def sample_to_fewshot(sample): 
@@ -54,7 +54,7 @@ def gsm8k(fewshot=10, fewshot_seed=42):
             sample_fields=record_to_sample, 
             shuffle=True,
             seed=fewshot_seed,
-            limi=fewshot,
+            limit=fewshot,
         )
         solver.insert(
             0, 
