@@ -21,11 +21,11 @@ def record_to_sample(record):
     )
 
 def sample_to_fewshot(sample): 
-    return(
+    return (
         f"{sample.input}\n\nReasoning:\n"
         + f"{sample.metadata['reasoning']}\n\n"
-        + f"ANSWER" {sample.target}
-    )
+        + f"ANSWER: {sample.target}"
+        )
 
 MATH_PROMPT_TEMPLATE = """
 Solve the following math problem step by step. The last line of your
@@ -64,13 +64,14 @@ def gsm8k(fewshot=10, fewshot_seed=42):
             )
     
 ## define task 
-    return Task(dataset=hf_dataset(
-        path="gsm8k",
-        data_dir="main",
-        split="test",
-        sample_fields=record_to_sample,
-    ),
-    solver=solver,
-    scorer=match(numeric=True),
-)
+    return Task(
+        dataset=hf_dataset(
+            path="gsm8k",
+            data_dir="main",
+            split="test",
+            sample_fields=record_to_sample,
+        ),
+        solver=solver,
+        scorer=match(numeric=True),
+    )
 
