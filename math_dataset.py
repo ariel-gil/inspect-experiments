@@ -79,9 +79,9 @@ def expression_equivalence():
     return score
 
 
+## anki r"""
 
-
-EQUIVALENCE_TEMPLATE = r""" ## anki
+EQUIVALENCE_TEMPLATE = r""" 
 Look at the following two expressions (answers to a math problem)
 and judge whether they are equivalent. Only perform trivial 
 simplifications
@@ -103,6 +103,7 @@ No
 
 Yes
 (give benefit of the doubt to units)
+
 ---
 
 YOUR TASK
