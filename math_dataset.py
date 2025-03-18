@@ -55,22 +55,22 @@ def math(shuffle=True):
 
 @scorer(metrics=[accuracy(), stderr()])
 def expression_equivalence():
-    async def score(state: TaskState, target: Target):
+    async def score(state: TaskState, target: Target): 
         ## extract answer 
-        match = re.search(AnswerPattern.LINE, state.output.completion) ## checking for answer format in AnswerPattern 
+        match = re.search(AnswerPattern.LINE, state.output.completion) ## checking for answer format in AnswerPattern  #anki re.
         if match: 
             # ask model to judge equivalnce 
             answer = match.group(1)
-            prompt = EQUIVALENCE_TEMPLATE % ({"expression1": target.text, "expression2:": answer})
+            prompt = EQUIVALENCE_TEMPLATE % ({"expression1": target.text, "expression2": answer}) # anki - % string formatting. also .format(), %(string)s
             result = await get_model().generate(prompt)
 
             ## Return score
             correct = result.completion.lower() == "yes"
             return Score(
-                value=CORRECT if correct else INCORRECT
+                value=CORRECT if correct else INCORRECT,
                 answer=answer, 
                 explanation=state.output.completion, 
-            )
+                )
         else: 
             return Score(
                 value=INCORRECT, 
@@ -80,4 +80,37 @@ def expression_equivalence():
 
 
 
-   
+
+EQUIVALENCE_TEMPLATE = r""" ## anki
+Look at the following two expressions (answers to a math problem)
+and judge whether they are equivalent. Only perform trivial 
+simplifications
+
+Examples:
+
+    Expression 1: $2x+3$
+    Expression 2: $3+2x$
+
+Yes
+
+    Expression 1: $x^2+2x+1$
+    Expression 2: $y^2+2y+1$
+
+No
+
+    Expression 1: 72 degrees
+    Expression 2: 72
+
+Yes
+(give benefit of the doubt to units)
+---
+
+YOUR TASK
+
+Respond with only "Yes" or "No" (without quotes). Do not include
+a rationale.
+
+    Expression 1: %(expression1)s
+    Expression 2: %(expression2)s
+""".strip()
+
