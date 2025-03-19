@@ -53,17 +53,22 @@ def math(shuffle=True):
 ## Math expressions can be logically equivalent but not literally the same
 ## Custom scorer to implement this (using a model) - 
 
+def clean_solution(solution):
+        # Preserve numeric values and degrees
+        clean = re.sub(r'(\\boxed|\\text|\\mathbb|\\mathcal){([^}]*)}', r'\2', solution)
+        clean = re.sub(r'\$', '', clean)  # Remove dollar signs
+        return clean.strip()
+
 @scorer(metrics=[accuracy(), stderr()])
 def expression_equivalence():
     async def score(state: TaskState, target: Target): 
         ## extract answer 
         match = re.search(AnswerPattern.LINE, state.output.completion) ## checking for answer format in AnswerPattern  #anki re.
         if match: 
-            ## Clean up \boxed {}
-            clean_target = re.sub()
-            # ask model to judge equivalnce 
+            clean_target = clean_solution(target.text)  # call the clean_solution on target
+
             answer = match.group(1)
-            prompt = EQUIVALENCE_TEMPLATE % ({"expression1": target.text, "expression2": answer}) # anki - % string formatting. also .format(), %(string)s
+            prompt = EQUIVALENCE_TEMPLATE % ({"expression1": clean_target, "expression2": answer})  # anki - % string formatting. also .format(), %(string)s
             result = await get_model().generate(prompt)
 
             ## Return score
@@ -105,12 +110,6 @@ No
 
 Yes
 (give benefit of the doubt to units)
-
-    Expression 1: \boxed{0}
-    Expression 2: 0
-
-Yes
-(ignore \boxed{} or other LaTeX notation)
 
 ---
 
